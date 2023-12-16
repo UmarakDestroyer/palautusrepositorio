@@ -8,7 +8,7 @@
         server-->>browser: HTML document
         deactivate server
 
-        Note right of the browser: Browser send new note data [note: "new note data"]
+        Note right of browser: Browser send new note data [note: "new note data"]
         
         browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
         activate server
