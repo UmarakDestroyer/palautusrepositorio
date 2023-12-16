@@ -34,9 +34,3 @@
 
         Note right of browser: The browser executes the callback function that renders the notes 
 ```
-1. POST /new_note
-    note: "note"  302 not Found
-2. GET /notes 200 OK
-3. GET  main.css
-4. GET main.js
-5. GET data.json
