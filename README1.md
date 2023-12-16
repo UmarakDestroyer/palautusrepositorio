@@ -7,6 +7,8 @@
         activate server
         server-->>browser: HTML document
         deactivate server
+
+        Note right of the browser: Browser send new note data [note: "new note data"]
         
         browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
         activate server
@@ -32,3 +34,9 @@
 
         Note right of browser: The browser executes the callback function that renders the notes 
 ```
+1. POST /new_note
+    note: "note"  302 not Found
+2. GET /notes 200 OK
+3. GET  main.css
+4. GET main.js
+5. GET data.json
