@@ -22,8 +22,8 @@ li {
 	padding-top: 3px;
 	font-size: 15px;
 .error {
-  color: lightgreen;
-  background: green;
+  color: red;
+  background: lightgrey;
   font-size: 20px;
   border-style: solid;
   border-radius: 5px;

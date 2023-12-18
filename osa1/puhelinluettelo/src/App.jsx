@@ -1,4 +1,37 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import './index.css'
+import personService from './services/persons'
+
+const Notification = ({message, error}) => {
+	if (message === null) {
+		return null
+	}
+
+	const goodStyle = {
+		color: 'white',
+		fontStyle: 'italic',
+		fontSize: 16,
+		radius: 10,
+		backgroundColor: 'green', 
+		padding: 20}
+
+	const badStyle = {
+		color: 'white',
+		fontStyle: 'italic',
+		fontSize: 16,
+		radius: 10,
+		backgroundColor: 'red', 
+		padding: 20}
+	const	styl = error ? badStyle : goodStyle 
+
+	return ( 
+		<div style={styl}>
+		{message}
+		</div>
+	)
+
+}
 const Filter = ({newSearch, searchFilter}) =>{
 	return(
   		<div>filter shown with: <input value={newSearch} onChange={searchFilter} /></div>
@@ -19,29 +52,57 @@ const PersonForm = ({addPerson, newPerson, handleNameChange, handleNumberChange}
       </form>
 	)
 }
-const Persons = ({newSearch, persons}) =>{
+const Persons = ({newSearch, persons, deletePerson}) =>{
 	return (
-	  <ul> {persons.filter((person)=> person.name.toLowerCase().includes(newSearch.toLowerCase())).map((person, id)=><li key={id}>{person.name} {person.number}</li>)}
+	  <ul> {persons.filter((person)=> person.name.toLowerCase().includes(newSearch.toLowerCase())).map((person)=><li key={person.id}>{person.name} {person.number}
+		  <button onClick={(event)=>deletePerson(event,person.id)}>delete</button></li>)}
 	  </ul>
 	)
 }
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
   ]) 
   const [newPerson, setNewPerson] = useState({name: "", number: ""})
   const [newSearch, setNewSearch] = useState("")
+  const [errorMessage, setErrorMessage] = useState({text: "", error: false})
+  useEffect(() => {
+	  personService.getAll()
+	.then(persons => {
+		  setPersons(persons)
+	  })
+  }, [])
   const addPerson = (event) => {
 	  event.preventDefault()
 	  if (persons.map(({name})=>name).includes(newPerson.name)){
-		alert(`${newPerson.name} is already added to the phonebook`)
+		if (window.confirm(`${newPerson.name} is already added to the phonebook, repalce the old number \n with a new one?`))
+		  {
+			const newObject = {...persons.find(person=>person.name==newPerson.name), number:newPerson.number}
+			setPersons(persons.map(person=> person.name != newPerson.name ? person : newObject))
+			personService.update(persons.find(person=>newPerson.name).id, newObject).then(res=>
+				{
+					
+	            			setErrorMessage({text: `Changed ${newPerson.name}'s number`, error: false});
+	            			setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)
+				}).catch( () => {
+
+	            			setErrorMessage({text: `Information of  ${name} has already been removed from the server`, error: true} );
+	            			setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)
+				})
+		  }
+
 		return 
 	  }
 	  const newPersonObject = {
 		  name: newPerson.name, 
 		  number: newPerson.number
 	  }
+	  
+	  personService.create(newPersonObject)
+	  .then(res => 
+		  { console.log(res);
+	            setErrorMessage({text: `Added ${newPerson.name}`, error: false});
+	            setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)})
 	  setPersons(persons.concat(newPersonObject))
 	  event.target.value = ""
 	  setNewPerson({name: "", number: ""})
@@ -59,6 +120,27 @@ const App = () => {
 	  
   }
 
+  const deletePerson = (event, id) =>{
+	  event.preventDefault()
+	  const name = persons.find(person=>person.id==id).name
+	  const text = `Delete ${name}`;
+	  if (window.confirm(text))
+	  {
+	  	setPersons(persons.filter(person=>person.id!=id))
+	  	personService.forget(id).then(res=>{
+			console.log(res);
+				
+	            	setErrorMessage({text: `Deleted ${name}`, error: false} );
+	            	setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)
+		}).catch(()=>{	
+	            	setErrorMessage({text: `${name} has already been deleted`, error: true} );
+	            	setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)
+		}
+		)
+	  }
+
+  }
+
   const searchFilter = (event) =>{
 	  event.preventDefault()
 	  setNewSearch(event.target.value)
@@ -68,7 +150,9 @@ const App = () => {
 
   return (
     <div>
+
       <h2>Phonebook</h2>
+	  {errorMessage.text != "" ? <Notification message={errorMessage.text} error={errorMessage.error} />: null}
 
       <Filter newSearch={newSearch} searchFilter={searchFilter} />
 
@@ -82,7 +166,7 @@ const App = () => {
       <h2>Numbers</h2>
 	  
 
-      <Persons persons={persons} newSearch={newSearch} /> 
+      <Persons persons={persons} newSearch={newSearch} deletePerson={deletePerson} /> 
     </div>
   )
 
