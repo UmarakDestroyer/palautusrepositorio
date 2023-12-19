@@ -1,0 +1,1 @@
+($env:VITE_SOME_KEY="62e724da2e5cc8348717783d90c8f179") -and (npm run dev) // Windows PowerShel

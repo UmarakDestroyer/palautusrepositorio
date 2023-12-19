@@ -1,0 +1,44 @@
+import {useEffect,  useState } from 'react'
+import axios from 'axios'
+
+function App() {
+	
+  const [countriesData, setCountriesData] = useState([])
+  const [countries, setCountries] = useState("")
+	
+  const regex = () => {return countries == "" ? new RegExp("*") :  RegExp(`${countries}*`)}
+  const countryChanged = (event) => {
+	event.preventDefault()
+	setCountries(event.target.value)
+
+  }
+	  
+  useEffect(()=>{
+ 	const baseUrl = "https://studies.cs.helsinki.fi/restcountries/api/" 
+  	const req = axios.get(`${baseUrl}/all`)
+	req.then((res)=>setCountriesData(res.data)).catch(()=>console.log("ei"))
+	console.log(countriesData)
+  }
+	  ,[])
+  return (
+	 <div>
+	  <div>
+	  find countries <input value={countries} onChange={countryChanged} />
+	  </div> 
+	<ul>
+	  
+		{
+		
+		countriesData.filter(c =>{
+			const regex = countries == "" ? new RegExp(".*"/i):new RegExp(`^(${countries}).*`)
+			;return regex.test(c.name.common)})
+			.map(c=>
+				<li>{c.name.common}</li>)
+		}
+	</ul>
+	  </div> 
+
+  )
+}
+
+export default App
