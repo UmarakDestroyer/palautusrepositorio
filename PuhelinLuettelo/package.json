@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "@powershell rm -r dist && cd ../osa1/puhelinluettelo && npm run build && @powershell cp -r ./dist ../../PuhelinLuettelo",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push origin"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +17,7 @@
     "express": "^4.18.2",
     "json-server": "^0.17.4",
     "morgan": "^1.10.0",
+    
     "prettier": "^3.1.1",
     "prettify": "^0.1.7"
   },
