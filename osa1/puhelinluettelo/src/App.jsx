@@ -63,13 +63,14 @@ const Persons = ({newSearch, persons, deletePerson}) =>{
 const App = () => {
   const [persons, setPersons] = useState([
   ]) 
-  const [newPerson, setNewPerson] = useState({name: "", number: ""})
+  const [newPerson, setNewPerson] = useState({name: "", number: "", id: ""})
   const [newSearch, setNewSearch] = useState("")
   const [errorMessage, setErrorMessage] = useState({text: "", error: false})
   useEffect(() => {
 	  personService.getAll()
-	.then(persons => {
-		  setPersons(persons)
+	.then(person => {
+		  setPersons(person);
+	          console.log(persons);
 	  })
   }, [])
   const addPerson = (event) => {
@@ -79,14 +80,14 @@ const App = () => {
 		  {
 			const newObject = {...persons.find(person=>person.name==newPerson.name), number:newPerson.number}
 			setPersons(persons.map(person=> person.name != newPerson.name ? person : newObject))
-			personService.update(persons.find(person=>newPerson.name).id, newObject).then(res=>
+			personService.update(persons.find(person=>newPerson.name ==person.name).id, newObject).then(res=>
 				{
 					
 	            			setErrorMessage({text: `Changed ${newPerson.name}'s number`, error: false});
 	            			setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)
-				}).catch( () => {
+				}).catch( (err) => {
 
-	            			setErrorMessage({text: `Information of  ${name} has already been removed from the server`, error: true} );
+	            			setErrorMessage({text: err.res.data, error: true} );
 	            			setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)
 				})
 		  }
@@ -102,7 +103,11 @@ const App = () => {
 	  .then(res => 
 		  { console.log(res);
 	            setErrorMessage({text: `Added ${newPerson.name}`, error: false});
-	            setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)})
+	            setTimeout(()=>setErrorMessage({...errorMessage, text: ""}), 5000)}).catch(
+			    err => {
+			setErrorMessage({text: err.response.data, error: true});
+			setTimeout(() => setErrorMessage({...errorMessage, text: ""}), 5000)	
+			    })
 	  setPersons(persons.concat(newPersonObject))
 	  event.target.value = ""
 	  setNewPerson({name: "", number: ""})
