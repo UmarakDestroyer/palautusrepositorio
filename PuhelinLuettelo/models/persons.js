@@ -19,8 +19,16 @@ const personSchema = new mongoose.Schema({
   	required:true},
   number: {
 	  type: String,
-	  required:true}
+	  validate: {
+	validator: function(v) {
+
+		return /^[0-9]{2,3}-[0-9]{6}*/.test(v)
+	},
+		  message: "no can do"
+	  }
+  }
 })
+
 
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
