@@ -8,7 +8,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build:ui": "@powershell rm -r dist && cd ../osa1/puhelinluettelo && npm run build && @powershell cp -r ./dist ../../PuhelinLuettelo",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push origin"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push origin",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
